@@ -67,7 +67,11 @@ namespace XJUnity3D.ImageEffects
         /// </param>
         protected virtual void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
-            Graphics.Blit(source, destination, material);
+            // (field) material ではなく (property) Material である点に注意します。
+            // もし material を指定すると、継承クラスで Material が一度も参照されないとき、
+            // material は null になります。その結果 Graphics.Bilt に失敗します。
+
+            Graphics.Blit(source, destination, Material);
         }
 
         /// <summary>
