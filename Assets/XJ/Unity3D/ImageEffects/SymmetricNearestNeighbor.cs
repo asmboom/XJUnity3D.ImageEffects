@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace XJUnity3D.ImageEffects
+namespace XJ.Unity3D.ImageEffects
 {
     [RequireComponent(typeof(Camera))]
     [ExecuteInEditMode]

@@ -19,7 +19,7 @@
         #pragma fragment frag
 
         #include "UnityCG.cginc"
-        #include "./XJShaderLibrary/ColorCollection.cginc"
+        #include "./Library/ColorCollection.cginc"
 
         struct vertexInput
         {

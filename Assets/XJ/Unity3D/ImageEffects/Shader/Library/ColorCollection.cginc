@@ -17,15 +17,6 @@
 ** IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-/*
-** Photoshop & misc math
-** Blending modes, RGB/HSL/Contrast/Desaturate, levels control
-**
-** Romain Dura | Romz
-** Blog: http://mouaif.wordpress.com
-** Post: http://mouaif.wordpress.com/?p=94
-*/
-
 float3 RgbToHsv(float3 rgbColor)
 {
     float4 K = float4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace XJUnity3D.ImageEffects
+namespace XJ.Unity3D.ImageEffects
 {
     [RequireComponent(typeof(Camera))]
     [ExecuteInEditMode]
@@ -12,7 +12,6 @@ namespace XJUnity3D.ImageEffects
         protected override void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
             Material.SetVector("_HslColorShift", this.hslColorShift);
-
             base.OnRenderImage(source, destination);
         }
     }

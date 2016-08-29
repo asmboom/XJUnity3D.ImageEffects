@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace XJUnity3D.ImageEffects
+namespace XJ.Unity3D.ImageEffects
 {
     /// <summary>
     /// ImageEffect の基底 Class です。

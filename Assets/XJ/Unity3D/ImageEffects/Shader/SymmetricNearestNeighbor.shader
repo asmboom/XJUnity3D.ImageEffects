@@ -20,7 +20,7 @@
             #pragma fragment frag
             
             #include "UnityCG.cginc"
-            #include "./XJShaderLibrary/ImageFilter.cginc"
+            #include "./Library/ImageFilter.cginc"
 
             struct vertexInput
             {
