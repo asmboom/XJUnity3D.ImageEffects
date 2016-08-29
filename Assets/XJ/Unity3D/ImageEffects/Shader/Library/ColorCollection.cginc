@@ -219,4 +219,10 @@ float3 ContrastSaturationBrightness(float3 color, float brt, float sat, float co
     return conColor;
 }
 
+float4 RgbToGray(float4 rgbColor)
+{
+    float gray = (rgbColor.r + rgbColor.g + rgbColor.r) / 3;
+    return float4(gray, gray, gray, rgbColor.a);
+}
+
 #endif //XJSHADERLIBRARY_COLORCOLLECTION_INCLUDED

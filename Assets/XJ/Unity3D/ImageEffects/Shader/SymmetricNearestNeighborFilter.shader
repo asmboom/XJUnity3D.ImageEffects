@@ -16,8 +16,8 @@
         {
             CGPROGRAM
 
-            #pragma vertex vert
-            #pragma fragment frag
+            #pragma vertex vertexShader
+            #pragma fragment fragmentShader
             
             #include "UnityCG.cginc"
             #include "./Library/ImageFilter.cginc"
@@ -35,11 +35,11 @@
             };
 
             sampler2D _MainTex;
-            int _ImageWidthPx;
-            int _ImageHeightPx;
-            int _FilterSizePx;
+            float _PixelLengthWidth;
+            float _PixelLengthHeight;
+            int _HalfFilterSizePx;
 
-            fragmentInput vert(vertexInput input)
+            fragmentInput vertexShader (vertexInput input)
             {
                 fragmentInput output;
                 output.vertex = mul(UNITY_MATRIX_MVP, input.vertex);
@@ -48,12 +48,13 @@
                 return output;
             }
 
-            fixed4 frag (fragmentInput input) : SV_Target
+            fixed4 fragmentShader (fragmentInput input) : SV_Target
             {
-                fixed4 color = SymmetricNearestNeighborFilter
-                      (_MainTex, int2(_ImageWidthPx, _ImageHeightPx), input.uv, _FilterSizePx);
-
-                return color;
+                    return SymmetricNearestNeighborFilter
+                            (_MainTex,
+                             _HalfFilterSizePx,
+                             float2(_PixelLengthWidth, _PixelLengthHeight),
+                             input.uv);
             }
 
             ENDCG
