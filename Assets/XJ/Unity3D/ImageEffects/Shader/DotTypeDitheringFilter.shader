@@ -16,6 +16,7 @@
         {
             CGPROGRAM
 
+            #pragma target 4.0;
             #pragma vertex vertexShader
             #pragma fragment fragmentShader
             

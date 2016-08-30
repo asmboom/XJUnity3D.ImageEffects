@@ -2,50 +2,31 @@
 #define XJSHADERLIBRARY_IMAGEFILTER_INCLUDED
 #include "./ColorCollection.cginc"
 
-float PrewittHorizontalFilter[9] =
+static const float PrewittFilterHorizontal[9] =
 { -1, 0, 1,
   -1, 0, 1,
   -1, 0, 1 };
 
-float PrewittVerticalFilter[9] =
+static const float PrewittFilterVertical[9] =
 { -1, -1, -1,
    0,  0,  0,
    1,  1,  1 };
 
-float SobelHorizontalFilter[9] =
+static const float SobelFilterHorizontal[9] =
 { -1, 0, 1,
   -2, 0, 2,
   -1, 0, 1 };
 
-float SobelVerticalFilter[9] =
+static const float SobelFilterVertical[9] =
 { -1, -2, -1,
    0,  0,  0,
    1,  2,  1 };
 
-float4x4 DotDitherMatrix =
-{ 0.74, 0.27, 0.40, 0.60 ,
-  0.80,    0, 0.13, 0.94 ,
-  0.47, 0.54, 0.67, 0.34 ,
+static const float4x4 DotDitherMatrix =
+{ 0.74, 0.27, 0.40, 0.60,
+  0.80, 0.00, 0.13, 0.94,
+  0.47, 0.54, 0.67, 0.34,
   0.20, 1.00, 0.87, 0.07 };
-
-//-------------------------------------------------------------------------------------------------
-// Dithering Filter (Dot type)
-//-------------------------------------------------------------------------------------------------
-float4 DotTypeDitheringFilter(sampler2D image, int2 imageSize, float2 inputPos)
-{
-    float4 grayColor = RgbToGray(tex2D(image, inputPos));
-
-    return grayColor;
-
-    int2 coordinatePx;
-    coordinatePx.x = round((inputPos.x * imageSize.x) + 0.5);
-    coordinatePx.y = round((inputPos.y * imageSize.y) + 0.5);
-
-    if (DotDitherMatrix[coordinatePx.x % 4][coordinatePx.y % 4] < grayColor.r)
-        return float4(0, 0, 0, grayColor.a);
-    else
-        return float4(1, 1, 1, grayColor.a);
-}
 
 //-------------------------------------------------------------------------------------------------
 // Prewitt Filter
@@ -62,8 +43,8 @@ float4 PrewittFilter(sampler2D image, float2 pixelLength, float2 texCoord)
         for (int y = -1; y <= 1; y++)
         {
             coordinate = float2(texCoord.x + pixelLength.x * x, texCoord.y + pixelLength.y * y);
-            sumHorizontal.rgb += tex2D(image, coordinate).rgb * PrewittHorizontalFilter[count];
-            sumVertical.rgb += tex2D(image, coordinate).rgb * PrewittVerticalFilter[count];
+            sumHorizontal.rgb += tex2D(image, coordinate).rgb * PrewittFilterHorizontal[count];
+            sumVertical.rgb += tex2D(image, coordinate).rgb * PrewittFilterVertical[count];
             count++;
         }
     }
@@ -90,8 +71,8 @@ float4 SobelFilter(sampler2D image, float2 pixelLength, float2 texCoord)
         for (int y = -1; y <= 1; y++)
         {
             coordinate = float2(texCoord.x + pixelLength.x * x, texCoord.y + pixelLength.y * y);
-            sumHorizontal.rgb += tex2D(image, coordinate).rgb * SobelHorizontalFilter[count];
-            sumVertical.rgb += tex2D(image, coordinate).rgb * SobelVerticalFilter[count];
+            sumHorizontal.rgb += tex2D(image, coordinate).rgb * SobelFilterHorizontal[count];
+            sumVertical.rgb += tex2D(image, coordinate).rgb * SobelFilterVertical[count];
             count++;
         }
     }
@@ -197,6 +178,28 @@ float4 SymmetricNearestNeighborFilter
     outputColor /= pixels;
 
     return outputColor;
+}
+
+//-------------------------------------------------------------------------------------------------
+// Dithering Filter (Dot type)
+//-------------------------------------------------------------------------------------------------
+float4 DotTypeDitheringFilter(sampler2D image, int2 imageSize, float2 inputPos)
+{
+    float4 grayColor = RgbToGray(tex2D(image, inputPos));
+    int2 coordinatePx;
+    coordinatePx.x = round((inputPos.x * imageSize.x) + 0.5);
+    coordinatePx.y = round((inputPos.y * imageSize.y) + 0.5);
+
+    float value = DotDitherMatrix[coordinatePx.x % 4][coordinatePx.y % 4];
+
+    if (DotDitherMatrix[coordinatePx.x % 4][coordinatePx.y % 4] < grayColor.r)
+    {
+        return float4(0, 0, 0, grayColor.a);
+    }
+    else
+    {
+        return float4(1, 1, 1, grayColor.a);
+    }
 }
 
 #endif //XJSHADERLIBRARY_IMAGEFILTER_INCLUDED

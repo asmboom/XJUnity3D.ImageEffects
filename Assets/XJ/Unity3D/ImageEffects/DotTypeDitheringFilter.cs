@@ -11,7 +11,6 @@ namespace XJ.Unity3D.ImageEffects
         {
             Material.SetFloat("_ImageSizeWidth", source.width);
             Material.SetFloat("_ImageSizeHeight", source.height);
-
             base.OnRenderImage(source, destination);
         }
     }
