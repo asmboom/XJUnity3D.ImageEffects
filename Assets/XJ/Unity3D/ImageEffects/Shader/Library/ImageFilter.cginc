@@ -23,10 +23,10 @@ float SobelVerticalFilter[9] =
    1,  2,  1 };
 
 float4x4 DotDitherMatrix =
-{ { 0.74, 0.27, 0.40, 0.60 } ,
-  { 0.80,    0, 0.13, 0.94 },
-  { 0.47, 0.54, 0.67, 0.34 },
-  { 0.20, 1.00, 0.87, 0.07 } };
+{ 0.74, 0.27, 0.40, 0.60 ,
+  0.80,    0, 0.13, 0.94 ,
+  0.47, 0.54, 0.67, 0.34 ,
+  0.20, 1.00, 0.87, 0.07 };
 
 //-------------------------------------------------------------------------------------------------
 // Dithering Filter (Dot type)
@@ -34,6 +34,8 @@ float4x4 DotDitherMatrix =
 float4 DotTypeDitheringFilter(sampler2D image, int2 imageSize, float2 inputPos)
 {
     float4 grayColor = RgbToGray(tex2D(image, inputPos));
+
+    return grayColor;
 
     int2 coordinatePx;
     coordinatePx.x = round((inputPos.x * imageSize.x) + 0.5);
