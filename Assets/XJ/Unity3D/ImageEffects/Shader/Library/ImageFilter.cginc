@@ -22,6 +22,11 @@ static const float SobelFilterVertical[9] =
    0,  0,  0,
    1,  2,  1 };
 
+static const float LaplacianFilterKernel[9] =
+{ -1, -1, -1,
+  -1,  8, -1,
+  -1, -1, -1 };
+
 static const float4x4 DotDitherMatrix =
 { 0.74, 0.27, 0.40, 0.60,
   0.80, 0.00, 0.13, 0.94,
@@ -31,7 +36,7 @@ static const float4x4 DotDitherMatrix =
 //-------------------------------------------------------------------------------------------------
 // Prewitt Filter
 //-------------------------------------------------------------------------------------------------
-float4 PrewittFilter(sampler2D image, float2 pixelLength, float2 texCoord)
+float4 PrewittFilter(sampler2D image, float2 pixelLength, float2 texCoord:TEXCOORD)
 {
     float4 sumHorizontal = float4(0, 0, 0, 1);
     float4 sumVertical = float4(0, 0, 0, 1);
@@ -59,7 +64,7 @@ float4 PrewittFilter(sampler2D image, float2 pixelLength, float2 texCoord)
 //-------------------------------------------------------------------------------------------------
 // Sobel Filter
 //-------------------------------------------------------------------------------------------------
-float4 SobelFilter(sampler2D image, float2 pixelLength, float2 texCoord)
+float4 SobelFilter(sampler2D image, float2 pixelLength, float2 texCoord:TEXCOORD)
 {
     float4 sumHorizontal = float4(0, 0, 0, 1);
     float4 sumVertical = float4(0, 0, 0, 1);
@@ -85,10 +90,32 @@ float4 SobelFilter(sampler2D image, float2 pixelLength, float2 texCoord)
 }
 
 //-------------------------------------------------------------------------------------------------
+// Laplacian Filter
+//-------------------------------------------------------------------------------------------------
+float4 LaplacianFilter(sampler2D image, float2 pixelLength, float2 texCoord:TEXCOORD)
+{
+    float4 color = float4(0, 0, 0, 1);
+    int count = 0;
+
+    for (int x = -1; x <= 1; x++)
+    {
+        for (int y = -1; y <= 1; y++)
+        {
+            texCoord = float2(texCoord.x + pixelLength.x * x,
+                texCoord.y + pixelLength.y * y);
+            color.rgb += tex2D(image, texCoord).rgb * LaplacianFilterKernel[count];
+            count++;
+        }
+    }
+
+    return color;
+}
+
+//-------------------------------------------------------------------------------------------------
 // Moving Average Filter
 //-------------------------------------------------------------------------------------------------
 float4 MovingAverageFilter
-    (sampler2D image, int halfFilterSizePx, float2 pixelLength, float2 inputPos)
+    (sampler2D image, int halfFilterSizePx, float2 pixelLength, float2 texCoord:TEXCOORD)
 {
     float4 color = float4(0, 0, 0, 1);
     float2 coordinate;
@@ -97,8 +124,8 @@ float4 MovingAverageFilter
     {
         for (int y = -halfFilterSizePx; y <= halfFilterSizePx; y++)
         {
-            color.rgb += tex2D(image, float2(inputPos.x + pixelLength.x * x,
-                                             inputPos.y + pixelLength.y * y)).rgb;
+            color.rgb += tex2D(image, float2(texCoord.x + pixelLength.x * x,
+                                             texCoord.y + pixelLength.y * y)).rgb;
         }
     }
 
@@ -113,10 +140,10 @@ float4 MovingAverageFilter
 // SymmetricNearestNeighbor Filter
 //-------------------------------------------------------------------------------------------------
 float4 CalcSymmetricNearestNeighborColor
-    (sampler2D image, float4 centerColor, float2 inputPos, float2 offset)
+    (sampler2D image, float4 centerColor, float2 texCoord:TEXCOORD, float2 offset)
 {
-    float4	color0 = tex2D(image, inputPos + offset);
-    float4	color1 = tex2D(image, inputPos - offset);
+    float4	color0 = tex2D(image, texCoord + offset);
+    float4	color1 = tex2D(image, texCoord - offset);
     float3	d0 = color0.rgb - centerColor.rgb;
     float3	d1 = color1.rgb - centerColor.rgb;
 
@@ -132,7 +159,7 @@ float4 CalcSymmetricNearestNeighborColor
 // SymmetricNearestNeighbor Filter
 //-------------------------------------------------------------------------------------------------
 float4 SymmetricNearestNeighborFilter
-    (sampler2D image, int halfFilterSizePx, float2 pixelLength, float2 inputPos)
+    (sampler2D image, int halfFilterSizePx, float2 pixelLength, float2 texCoord:TEXCOORD)
 {
     // 実際には右側～下半分の座標を参照した結果も注視点に反映されますが、
     // SymmetricNearestNeighborFilter は点対称に値を比較するため、
@@ -143,7 +170,7 @@ float4 SymmetricNearestNeighborFilter
     // 除算はコストが大きいので CPU で事前計算して渡した方が高速になります。
 
     float pixels = 1.0f;
-    float4 centerColor = tex2D(image, inputPos);
+    float4 centerColor = tex2D(image, texCoord);
     float4 outputColor = centerColor;
 
     // 注視点の上半分の算出
@@ -157,7 +184,7 @@ float4 SymmetricNearestNeighborFilter
             float2 offset = float2(x * pixelLength.x, offsetY);
 
             outputColor += CalcSymmetricNearestNeighborColor
-                (image, centerColor, inputPos, offset) * 2.0f;
+                (image, centerColor, texCoord, offset) * 2.0f;
 
             pixels += 2.0f;
         }
@@ -170,7 +197,7 @@ float4 SymmetricNearestNeighborFilter
         float2 offset = float2(x * pixelLength.x, 0.0f);
 
         outputColor += CalcSymmetricNearestNeighborColor
-            (image, centerColor, inputPos, offset) * 2.0f;
+            (image, centerColor, texCoord, offset) * 2.0f;
 
         pixels += 2.0f;
     }
@@ -183,12 +210,12 @@ float4 SymmetricNearestNeighborFilter
 //-------------------------------------------------------------------------------------------------
 // Dithering Filter (Dot type)
 //-------------------------------------------------------------------------------------------------
-float4 DotTypeDitheringFilter(sampler2D image, int2 imageSize, float2 inputPos)
+float4 DotTypeDitheringFilter(sampler2D image, int2 imageSize, float2 texCoord:TEXCOORD)
 {
-    float4 grayColor = RgbToGray(tex2D(image, inputPos));
+    float4 grayColor = RgbToGray(tex2D(image, texCoord));
     int2 coordinatePx;
-    coordinatePx.x = round((inputPos.x * imageSize.x) + 0.5);
-    coordinatePx.y = round((inputPos.y * imageSize.y) + 0.5);
+    coordinatePx.x = round((texCoord.x * imageSize.x) + 0.5);
+    coordinatePx.y = round((texCoord.y * imageSize.y) + 0.5);
 
     float value = DotDitherMatrix[coordinatePx.x % 4][coordinatePx.y % 4];
 
