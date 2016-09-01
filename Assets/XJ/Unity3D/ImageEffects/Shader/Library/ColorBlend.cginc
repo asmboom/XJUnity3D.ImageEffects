@@ -1,7 +1,13 @@
 #ifndef XJSHADERLIBRARY_COLORBLEND_INCLUDED
 #define XJSHADERLIBRARY_COLORBLEND_INCLUDED
 
-#include "./CollorCollection.cginc"
+#include "./ColorCollection.cginc"
+
+// own
+float4 BlendAlpha(float4 destinationColor, float4 sourceColor, float strength)
+{
+    return destinationColor * (1 - sourceColor.a * strength) + sourceColor * strength;
+}
 
 float3 BlendLighten(float3 baseColor, float3 blendColor)
 {

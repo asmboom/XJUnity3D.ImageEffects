@@ -36,7 +36,7 @@ static const float4x4 DotDitherMatrix =
 //-------------------------------------------------------------------------------------------------
 // Prewitt Filter
 //-------------------------------------------------------------------------------------------------
-float4 PrewittFilter(sampler2D image, float2 pixelLength, float2 texCoord:TEXCOORD)
+float4 PrewittFilter(sampler2D image, float2 pixelLength, float2 texCoord)
 {
     float4 sumHorizontal = float4(0, 0, 0, 1);
     float4 sumVertical = float4(0, 0, 0, 1);
@@ -64,7 +64,7 @@ float4 PrewittFilter(sampler2D image, float2 pixelLength, float2 texCoord:TEXCOO
 //-------------------------------------------------------------------------------------------------
 // Sobel Filter
 //-------------------------------------------------------------------------------------------------
-float4 SobelFilter(sampler2D image, float2 pixelLength, float2 texCoord:TEXCOORD)
+float4 SobelFilter(sampler2D image, float2 pixelLength, float2 texCoord)
 {
     float4 sumHorizontal = float4(0, 0, 0, 1);
     float4 sumVertical = float4(0, 0, 0, 1);
@@ -92,7 +92,7 @@ float4 SobelFilter(sampler2D image, float2 pixelLength, float2 texCoord:TEXCOORD
 //-------------------------------------------------------------------------------------------------
 // Laplacian Filter
 //-------------------------------------------------------------------------------------------------
-float4 LaplacianFilter(sampler2D image, float2 pixelLength, float2 texCoord:TEXCOORD)
+float4 LaplacianFilter(sampler2D image, float2 pixelLength, float2 texCoord)
 {
     float4 color = float4(0, 0, 0, 1);
     int count = 0;
@@ -115,7 +115,7 @@ float4 LaplacianFilter(sampler2D image, float2 pixelLength, float2 texCoord:TEXC
 // Moving Average Filter
 //-------------------------------------------------------------------------------------------------
 float4 MovingAverageFilter
-    (sampler2D image, int halfFilterSizePx, float2 pixelLength, float2 texCoord:TEXCOORD)
+    (sampler2D image, int halfFilterSizePx, float2 pixelLength, float2 texCoord)
 {
     float4 color = float4(0, 0, 0, 1);
     float2 coordinate;
@@ -140,7 +140,7 @@ float4 MovingAverageFilter
 // SymmetricNearestNeighbor Filter
 //-------------------------------------------------------------------------------------------------
 float4 CalcSymmetricNearestNeighborColor
-    (sampler2D image, float4 centerColor, float2 texCoord:TEXCOORD, float2 offset)
+    (sampler2D image, float4 centerColor, float2 texCoord, float2 offset)
 {
     float4	color0 = tex2D(image, texCoord + offset);
     float4	color1 = tex2D(image, texCoord - offset);
@@ -159,7 +159,7 @@ float4 CalcSymmetricNearestNeighborColor
 // SymmetricNearestNeighbor Filter
 //-------------------------------------------------------------------------------------------------
 float4 SymmetricNearestNeighborFilter
-    (sampler2D image, int halfFilterSizePx, float2 pixelLength, float2 texCoord:TEXCOORD)
+    (sampler2D image, int halfFilterSizePx, float2 pixelLength, float2 texCoord)
 {
     // 実際には右側～下半分の座標を参照した結果も注視点に反映されますが、
     // SymmetricNearestNeighborFilter は点対称に値を比較するため、
@@ -210,9 +210,9 @@ float4 SymmetricNearestNeighborFilter
 //-------------------------------------------------------------------------------------------------
 // Dithering Filter (Dot type)
 //-------------------------------------------------------------------------------------------------
-float4 DotTypeDitheringFilter(sampler2D image, int2 imageSize, float2 texCoord:TEXCOORD)
+float4 DotTypeDitheringFilter(sampler2D image, int2 imageSize, float2 texCoord)
 {
-    float4 grayColor = RgbToGray(tex2D(image, texCoord));
+    float4 grayColor = ToGrayColor(tex2D(image, texCoord));
     int2 coordinatePx;
     coordinatePx.x = round((texCoord.x * imageSize.x) + 0.5);
     coordinatePx.y = round((texCoord.y * imageSize.y) + 0.5);

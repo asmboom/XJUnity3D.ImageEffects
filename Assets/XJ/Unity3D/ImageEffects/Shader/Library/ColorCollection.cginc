@@ -20,8 +20,14 @@
 float3 RgbToHsv(float3 rgbColor)
 {
     float4 K = float4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-    float4 p = lerp(float4(rgbColor.bg, K.wz), float4(rgbColor.gb, K.xy), step(rgbColor.b, rgbColor.g));
-    float4 q = lerp(float4(p.xyw, rgbColor.r), float4(rgbColor.r, p.yzx), step(p.x, rgbColor.r));
+
+    float4 p = lerp(float4(rgbColor.bg, K.wz),
+                    float4(rgbColor.gb, K.xy),
+                    step(rgbColor.b, rgbColor.g));
+
+    float4 q = lerp(float4(p.xyw, rgbColor.r),
+                    float4(rgbColor.r, p.yzx),
+                    step(p.x, rgbColor.r));
 
     float d = q.x - min(q.w, q.y);
     float e = 1.0e-10;
@@ -93,7 +99,7 @@ float3 RgbToHsl(float3 rgbColor)
     return hsl;
 }
 
-float HueToRGB(float f1, float f2, float hue)
+float HueToRgb(float f1, float f2, float hue)
 {
     if (hue < 0.0)
     {
@@ -149,9 +155,9 @@ float3 HslToRgb(float3 hsl)
 
         float f1 = 2.0 * hsl.z - f2;
 
-        rgb.r = HueToRGB(f1, f2, hsl.x + (1.0 / 3.0));
-        rgb.g = HueToRGB(f1, f2, hsl.x);
-        rgb.b = HueToRGB(f1, f2, hsl.x - (1.0 / 3.0));
+        rgb.r = HueToRgb(f1, f2, hsl.x + (1.0 / 3.0));
+        rgb.g = HueToRgb(f1, f2, hsl.x);
+        rgb.b = HueToRgb(f1, f2, hsl.x - (1.0 / 3.0));
     }
 
     return rgb;
@@ -190,6 +196,7 @@ float4 Desaturate(float3 color, float Desaturation)
     float3 grayXfer = float3(0.3, 0.59, 0.11);
     float d = dot(grayXfer, color);
     float3 gray = float3(d, d, d);
+
     return float4(lerp(color, gray, Desaturation), 1.0);
 }
 
@@ -219,10 +226,23 @@ float3 ContrastSaturationBrightness(float3 color, float brt, float sat, float co
     return conColor;
 }
 
-float4 RgbToGray(float4 rgbColor)
+// ------------------------------------------------------------------------------------------------
+// 平均輝度を用いてグレースケール色に変換します。
+// ------------------------------------------------------------------------------------------------
+float4 ToGrayColor(float4 color)
 {
-    float gray = (rgbColor.r + rgbColor.g + rgbColor.r) / 3;
-    return float4(gray, gray, gray, rgbColor.a);
+    float gray = (color.r + color.g + color.r) / 3;
+
+    return float4(gray, gray, gray, color.a);
+}
+
+// ------------------------------------------------------------------------------------------------
+// NTSC(人間の視覚特性)ベースでグレースケール色に変換します。除算がないので高速です。
+// ------------------------------------------------------------------------------------------------
+float4 ToNTSCGrayColor(float4 color)
+{
+    color.rgb = 0.298912f * color.r + 0.586611f * color.g + 0.114478f * color.b;
+    return color;
 }
 
 #endif //XJSHADERLIBRARY_COLORCOLLECTION_INCLUDED
