@@ -35,8 +35,8 @@
             };
 
             sampler2D _MainTex;
-            float _PixelLengthWidth;
-            float _PixelLengthHeight;
+            float _PixelWidth;
+            float _PixelHeight;
             int _HalfFilterSizePx;
 
             fragmentInput vertexShader (vertexInput input)
@@ -53,7 +53,7 @@
                     return MovingAverageFilter
                             (_MainTex,
                              _HalfFilterSizePx,
-                             float2(_PixelLengthWidth, _PixelLengthHeight),
+                             float2(_PixelWidth, _PixelHeight),
                              input.uv);
             }
 

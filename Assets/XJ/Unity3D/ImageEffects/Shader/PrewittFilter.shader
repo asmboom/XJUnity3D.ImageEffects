@@ -35,8 +35,8 @@
             };
 
             sampler2D _MainTex;
-            float _PixelLengthWidth;
-            float _PixelLengthHeight;
+            float _PixelWidth;
+            float _PixelHeight;
 
             fragmentInput vertexShader (vertexInput input)
             {
@@ -51,7 +51,7 @@
             {
                 return PrewittFilter
                        (_MainTex,
-                        float2(_PixelLengthWidth, _PixelLengthHeight),
+                        float2(_PixelWidth, _PixelHeight),
                         input.uv);
             }
 

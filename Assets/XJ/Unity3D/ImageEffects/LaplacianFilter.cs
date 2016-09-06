@@ -10,8 +10,8 @@ namespace XJ.Unity3D.ImageEffects
 
         protected override void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
-            Material.SetFloat("_PixelLengthWidth", 1.0f / source.width);
-            Material.SetFloat("_PixelLengthHeight", 1.0f / source.height);
+            Material.SetFloat("_PixelWidth", 1.0f / source.width);
+            Material.SetFloat("_PixelHeight", 1.0f / source.height);
 
             base.OnRenderImage(source, destination);
         }

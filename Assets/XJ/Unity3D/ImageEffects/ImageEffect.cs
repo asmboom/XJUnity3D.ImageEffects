@@ -45,14 +45,14 @@ namespace XJ.Unity3D.ImageEffects
         {
             if (!SystemInfo.supportsImageEffects)
             {
-                enabled = false;
+                base.enabled = false;
 
                 return;
             }
 
-            if (!shader || !shader.isSupported)
+            if (!this.shader || !this.shader.isSupported)
             {
-                enabled = false;
+                base.enabled = false;
             }
         }
 
@@ -71,7 +71,7 @@ namespace XJ.Unity3D.ImageEffects
             // もし material を指定すると、継承クラスで Material が一度も参照されないとき、
             // material は null になります。その結果 Graphics.Bilt に失敗します。
 
-            Graphics.Blit(source, destination, Material);
+            Graphics.Blit(source, destination, this.Material);
         }
 
         /// <summary>

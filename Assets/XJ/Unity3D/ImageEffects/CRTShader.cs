@@ -67,22 +67,22 @@ namespace XJ.Unity3D.ImageEffects
 
         protected override void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
-            Material.SetFloat("_ImageWidth", source.width);
-            Material.SetFloat("_ImageHeight", source.height);
+            base.Material.SetFloat("_ImageWidth", source.width);
+            base.Material.SetFloat("_ImageHeight", source.height);
 
-            Material.SetFloat("_PixelWidth", 1f / source.width);
-            Material.SetFloat("_PixelHeight", 1f / source.height);
+            base.Material.SetFloat("_PixelWidth", 1f / source.width);
+            base.Material.SetFloat("_PixelHeight", 1f / source.height);
 
-            Material.SetInt("_ShadowMaskType", (int)this.crtType);
-            Material.SetInt("_EnableBarrelDistortion", this.enalbeBarrelDistortion ? 1 : 0);
-            Material.SetTexture("_GhostTex", this.ghostTex);
-            Material.SetFloat("_GhostStrength", this.ghostStrength);
-            Material.SetFloat("_NoiseStrength", this.noiseStrength);
-            Material.SetFloat("_EdgeShadowStrength", this.edgeShadowStrength);
-            Material.SetVector("_ReflectionLightPosition", this.reflectionLightPosition);
-            Material.SetVector("_ReflectionLightColor", this.reflectionLightColor);
-            Material.SetTexture("_GlareTex", this.glareTex);
-            Material.SetFloat("_GlareStrength", this.glareStrength);
+            base.Material.SetInt("_ShadowMaskType", (int)this.crtType);
+            base.Material.SetInt("_EnableBarrelDistortion", this.enalbeBarrelDistortion ? 1 : 0);
+            base.Material.SetTexture("_GhostTex", this.ghostTex);
+            base.Material.SetFloat("_GhostStrength", this.ghostStrength);
+            base.Material.SetFloat("_NoiseStrength", this.noiseStrength);
+            base.Material.SetFloat("_EdgeShadowStrength", this.edgeShadowStrength);
+            base.Material.SetVector("_ReflectionLightPosition", this.reflectionLightPosition);
+            base.Material.SetVector("_ReflectionLightColor", this.reflectionLightColor);
+            base.Material.SetTexture("_GlareTex", this.glareTex);
+            base.Material.SetFloat("_GlareStrength", this.glareStrength);
 
             base.OnRenderImage(source, destination);
         }
