@@ -1,6 +1,9 @@
 ﻿#include "./Library/ColorCollection.cginc"
-// Upgrade NOTE: excluded shader from DX11, Xbox360, OpenGL ES 2.0 because it uses unsized arrays
-#pragma exclude_renderers d3d11 xbox360 gles
+
+// このシェーダに固有で、強い依存性があるパラメータのみ ShaderFunctions に定義しています。
+// 例えば、1ピクセル当たりのサイズを示す値 pixelSize (_PixelSize)などは、
+// 他のシェーダと組み合わせるとき、重複する可能性があります。したがって、
+// ShaderFunctions には定義せず、このシェーダを呼び出す別のシェーダで定義されるべきです。
 
 // ------------------------------------------------------------------------------------------------
 // H, S, V 成分の分割数を指定し、HSV 色を減色します。
@@ -25,26 +28,26 @@ float4 ReduceColorWithHslDivide
 // ------------------------------------------------------------------------------------------------
 // 入力された色を、ユークリッド距離を用いて、パレット上の色のいずれかにマップします。
 // ------------------------------------------------------------------------------------------------
-float4 MapToPalletColorWithEuclideanDistance
-    (float4 rgbColor float4[] rgbPallet, int rgbPalletLength)
+float4 MapToPalletColorWithRgbEuclideanDistance
+    (float4 rgbColor, float4 colorPallet[256], int colorPalletLength)
 {
     // R,G,B の各成分の距離で比較します。
     // 各成分で一番長い距離は 0 ~ 1 の 1 になります。
 
     float minLength = 3; // RGB
     float tempLength = 0;
-    float4 minLengthColor = rgbPallet[0];
+    float4 minLengthColor = colorPallet[0];
 
-    for (int i = 0; i < rgbPalletLength; i++)
+    for (int i = 0; i < colorPalletLength; i++)
     {
-        tempLength = abs(rgbPallet[i].r - rgbColor.r)
-                   + abs(rgbPallet[i].g - rgbColor.g)
-                   + abs(rgbPallet[i].b - rgbColor.b);
+        tempLength = abs(colorPallet[i].r - rgbColor.r)
+                   + abs(colorPallet[i].g - rgbColor.g)
+                   + abs(colorPallet[i].b - rgbColor.b);
 
         if (minLength > tempLength)
         {
             minLength = tempLength;
-            minLengthColor = rgbPallet[i];
+            minLengthColor = colorPallet[i];
         }
     }
 
@@ -60,9 +63,11 @@ float4 ScaledownWithPointSampling(sampler2D image, float2 texCoord, int divide)
 }
 
 // ------------------------------------------------------------------------------------------------
-// Liner サンプリングで解像度を下げます。やや高度ですがディティールがわずかに残る可能性があります。
+// Liner サンプリングで解像度を下げます。実用的な速度ですが、やや高度です。
+// ディティールがわずかに残る可能性があります。
 // ------------------------------------------------------------------------------------------------
-float4 ScaledownWithLinerSampling(sampler2D image, float2 texCoord, float2 pixelSize, int divide)
+float4 ScaledownWithLinerSampling
+    (sampler2D image, float2 texCoord, float2 pixelSize, int divide)
 {
     texCoord = texCoord * divide;
 
